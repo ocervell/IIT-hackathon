@@ -1,8 +1,5 @@
 init_lat = 41.883734
 init_lng = -87.628858
-
-	
-
 var map = L.map('map').setView([init_lat, init_lng], 15);
 var marker = L.marker([init_lat, init_lng]).addTo(map)
       .bindPopup('Chicago Loop')
@@ -13,157 +10,126 @@ var layer1 = L.tileLayer('http://{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.png'
 })
   .setOpacity(0.9)
   .addTo(map);
-
 var layer2 = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 })
   .setOpacity(0.6)
   .addTo(map);
-  
+var baseIcon = L.Icon.extend({
+  options: {
+    iconSize: [22, 27], // size of the icon
+    //shadowSize: [51, 37], // size of the shadow
+    iconAnchor: [16, 37], // point of the icon which will correspond to marker's location
+    //shadowAnchor: [25, 37],  // the same for the shadow
+    popupAnchor: [1, -37] // point from which the popup should open relative to the iconAnchor
+  }
+});
 
- var baseIcon = L.Icon.extend({
-         options: {
-             
-             iconSize: [22, 27], // size of the icon
-             //shadowSize: [51, 37], // size of the shadow
-             iconAnchor: [16, 37], // point of the icon which will correspond to marker's location
-             //shadowAnchor: [25, 37],  // the same for the shadow
-             popupAnchor: [1, -37] // point from which the popup should open relative to the iconAnchor
-        }
-    });
-	
 var schIcon = new baseIcon({ iconUrl: 'static/images/buildings.png' });
 var libIcon = new baseIcon({ iconUrl: 'static/images/doe.png' });
 var parksIcon = new baseIcon({ iconUrl: 'static/images/parks.png' });
 var hosIcon = new baseIcon({ iconUrl: 'static/images/hpd.png' });
-var crimeIcon = new baseIcon({ iconUrl: 'static/images/nypd.png' });	
+var crimeIcon = new baseIcon({ iconUrl: 'static/images/nypd.png' });
 var get_values = function(lat, lng, radius){
-      $.ajax({
-            url: '/get_csv_values',
-            data: JSON.stringify({'lat': lat, 'lng': lng, 'radius': radius}, null, '\t'),
-            contentType: 'application/json;charset=UTF-8',
-            type: 'POST',
-            success: function(data) {
-				var list = ""
-				for (item in list){
-					map.removeLayer(list[item])
-				}
-				 list= JSON.parse(data)
-				
-                   for (item in list){
-					   if(list[item]){
-                         
-						 path = list[item]['path']
-                         lat = list[item]['lat']
-                         lng = list[item]['lng']
-                         name = list[item]['name']
-						 if(lat!= null && lng != null){
-							
-							var icon = get_icon(path)
-							
-							L.marker([lat, lng],{icon: icon}).addTo(map)
-                               .bindPopup(name)
-                               .openPopup();
-						 }
-						
-					   }
-					   
-                   };
-            },
-            error: function(error) {
-                alert(error);
-            }
-      });
+  $.ajax({
+    url: '/get_csv_values',
+    data: JSON.stringify({'lat': lat, 'lng': lng, 'radius': radius}, null, '\t'),
+    contentType: 'application/json;charset=UTF-8',
+    type: 'POST',
+    success: function(data) {
+      var list = ""
+      for (item in list){
+    	  map.removeLayer(list[item])
+    	}
+    	list = JSON.parse(data)
+      for (item in list){
+    	  if(list[item]){
+          path = list[item]['path']
+          lat = list[item]['lat']
+          lng = list[item]['lng']
+          name = list[item]['name']
+          if(lat!= null && lng != null){
+            var icon = get_icon(path)
+            L.marker([lat, lng],{icon: icon}).addTo(map)
+              .bindPopup(name)
+              .openPopup();
+          }
+        }
+      };
+    },
+    error: function(error) {
+      alert(error);
+    }
+  });
 }
-
 var get_icon = function(path){
-	
-	switch(path){
-		case 'crimefinal.csv':
-			return crimeIcon;
-		case 'hosfinal.csv':
-			return hosIcon;
-		case 'librariesfinal.csv':
-			return libIcon;
-		case 'schoolfinal.csv':
-			return schIcon;
-		case 'parksfinal.csv':
-			return parksIcon;
-		default:
-			return new L.Icon.Default();
-		
-		
+  switch(path){
+  	case 'crimefinal.csv':
+  		return crimeIcon;
+  	case 'hosfinal.csv':
+  		return hosIcon;
+  	case 'librariesfinal.csv':
+  		return libIcon;
+  	case 'schoolfinal.csv':
+  		return schIcon;
+  	case 'parksfinal.csv':
+  		return parksIcon;
+  	default:
+  		return new L.Icon.Default();
 	}
-	
-	
 }
-
 var markers = get_values(init_lat, init_lng, 15)
-var lat
-var lng
-
-
-
 var get_qof = function(){
-      var qof =0
-	  $.ajax({
-            url: '/ret_qof',
-            data: JSON.stringify({'qof': qof}, null, '\t'),
-            contentType: 'application/json;charset=UTF-8',
-            type: 'POST',
-            success: function(data) {
-					
-					
-					list = JSON.parse(data)
-					console.log(list)
-                   console.log(qof)
-				   document.getElementById("display").innerHTML = list['qof']
-            },
-            error: function(error) {
-                alert(error);
-            }
-			
-      });
-			
+  var qof = 0
+  $.ajax({
+    url: '/ret_qof',
+    data: JSON.stringify({'qof': qof}, null, '\t'),
+    contentType: 'application/json;charset=UTF-8',
+    type: 'POST',
+    success: function(data) {
+		  list = JSON.parse(data)
+			console.log(list)
+      console.log(qof)
+		  document.getElementById("display").innerHTML = list['qof']
+    },
+    error: function(error) {
+        alert(error);
+    }
+  });
 }
+
 $('#address').focusout(function(){
-      var address=$('#address').val()
-      console.log("Address: " + address)
-      $.ajax({
-            url: '/address',
-            data: $('form').serialize(),
-            type: 'POST',
-            success: function(coordinates) {
-				
-                  console.log("Coordinates: " + coordinates);
-                  var coordinates = JSON.parse(coordinates)
-                  lat = coordinates.lat
-                  lng = coordinates.lng
-                  console.log(lat)
-                  console.log(lng)
-                  c = new L.LatLng(lat, lng)
-                  map.panTo(c, 15);
-                  marker.setLatLng(c)
-                  circle.setLatLng(c)
-                  markers = get_values(lat, lng, 15)
-				  
-            },
-            error: function(error) {
-                alert(error);
-            }
-      });
-	  get_qof()
+  var address=$('#address').val()
+  console.log("Address: " + address)
+  $.ajax({
+    url: '/address',
+    data: $('form').serialize(),
+    type: 'POST',
+    success: function(coordinates) {
+      console.log("Coordinates: " + coordinates);
+      var coordinates = JSON.parse(coordinates)
+      lat = coordinates.lat
+      lng = coordinates.lng
+      console.log(lat)
+      console.log(lng)
+      c = new L.LatLng(lat, lng)
+      map.panTo(c, 15);
+      marker.setLatLng(c)
+      circle.setLatLng(c)
+      markers = get_values(lat, lng, 15)
+    },
+    error: function(error) {
+        alert(error);
+    }
+  });
+  get_qof()
 });
 
-
-
-
-
- $("#slider").on("slide", function( event, ui,qof ) {
-      ui.value = qof
-      //circle.setRadius(radius)
-      //markers = get_values(lat, lng, radius)
-}); 
+$("#slider").on("slide", function( event, ui,qof ) {
+  ui.value = qof
+  //circle.setRadius(radius)
+  //markers = get_values(lat, lng, radius)
+});
 
 // $(document).ready(function () {
 //     var sevenDaysAgo;
@@ -198,7 +164,7 @@ $('#address').focusout(function(){
 //     });
 
 //     //define agency icons based on the base icon
-    
+
 //     var dsnyIcon = new baseIcon({ iconUrl: 'static/images/dsny.png' });
 //     var fdnyIcon = new baseIcon({ iconUrl: 'static/images/fdny.png' });
 //     var doeIcon = new baseIcon({ iconUrl: 'static/images/doe.png' });
