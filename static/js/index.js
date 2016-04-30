@@ -1,9 +1,9 @@
-init_lat = 41.883734
-init_lng = -87.628858
+init_lat = 41.883734;
+init_lng = -87.628858;
 var map = L.map('map').setView([init_lat, init_lng], 15);
-var marker = L.marker([init_lat, init_lng]).addTo(map)
-      .bindPopup('Chicago Loop')
-      .openPopup();
+  var marker = L.marker([init_lat, init_lng]).addTo(map)
+  .bindPopup('Chicago Loop')
+  .openPopup();
 var circle = L.circle([init_lat, init_lng], 1000).addTo(map);
 var layer1 = L.tileLayer('http://{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.png', {
   attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
@@ -37,20 +37,20 @@ var get_values = function(lat, lng, radius){
     contentType: 'application/json;charset=UTF-8',
     type: 'POST',
     success: function(data) {
-      var list = ""
+      var list = "";
       for (item in list){
-    	  map.removeLayer(list[item])
+    	  map.removeLayer(list[item]);
     	}
-    	list = JSON.parse(data)
+    	list = JSON.parse(data);
       for (item in list){
     	  if(list[item]){
-          path = list[item]['path']
-          lat = list[item]['lat']
-          lng = list[item]['lng']
-          name = list[item]['name']
+          path = list[item]['path'];
+          lat = list[item]['lat'];
+          lng = list[item]['lng'];
+          name = list[item]['name'];
           if(lat!= null && lng != null){
-            var icon = get_icon(path)
-            L.marker([lat, lng],{icon: icon}).addTo(map)
+            var icon = get_icon(path);
+            L.marker([lat, lng],{icon: icon}).addTo(map);
               .bindPopup(name)
               .openPopup();
           }
@@ -87,16 +87,16 @@ var get_qof = function(){
     contentType: 'application/json;charset=UTF-8',
     type: 'POST',
     success: function(data) {
-		  list = JSON.parse(data)
-			console.log(list)
-      console.log(qof)
-		  document.getElementById("display").innerHTML = list['qof']
+		  list = JSON.parse(data);
+			console.log(list);
+      console.log(qof);
+		  document.getElementById("display").innerHTML = list['qof'];
     },
     error: function(error) {
         alert(error);
     }
   });
-}
+};
 
 $('#address').focusout(function(){
   var address=$('#address').val()
@@ -107,26 +107,26 @@ $('#address').focusout(function(){
     type: 'POST',
     success: function(coordinates) {
       console.log("Coordinates: " + coordinates);
-      var coordinates = JSON.parse(coordinates)
-      lat = coordinates.lat
-      lng = coordinates.lng
-      console.log(lat)
-      console.log(lng)
-      c = new L.LatLng(lat, lng)
+      var coordinates = JSON.parse(coordinates);
+      lat = coordinates.lat;
+      lng = coordinates.lng;
+      console.log(lat);
+      console.log(lng);
+      c = new L.LatLng(lat, lng);
       map.panTo(c, 15);
-      marker.setLatLng(c)
-      circle.setLatLng(c)
-      markers = get_values(lat, lng, 15)
+      marker.setLatLng(c);
+      circle.setLatLng(c);
+      markers = get_values(lat, lng, 15);
     },
     error: function(error) {
         alert(error);
     }
   });
-  get_qof()
+  get_qof();
 });
 
 $("#slider").on("slide", function( event, ui,qof ) {
-  ui.value = qof
+  ui.value = qof;
   //circle.setRadius(radius)
   //markers = get_values(lat, lng, radius)
 });

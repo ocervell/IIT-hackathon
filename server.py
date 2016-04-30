@@ -11,7 +11,6 @@ import csv
 import pprint
 import math
 
-
 DEBUG = 'INFO'
 gmaps = googlemaps.Client("AIzaSyDqlY2dyOTrvcYWBtvsibdsetN14fJcnL4")
 app = Flask(__name__)
@@ -25,7 +24,6 @@ hos_csv = 'datasets/hosfinal.csv'
 libraries_csv = 'datasets/librariesfinal.csv'
 school_csv = 'datasets/schoolfinal.csv'
 parks_csv = 'datasets/parksfinal.csv'
-
 csv_paths = [crime_csv, hos_csv, libraries_csv, school_csv, parks_csv]
 
 ###########
@@ -42,9 +40,9 @@ def read_csv(filepath):
 def log_config(log_level):
     # check how your script can write to /var/log since there are some permission issues
     logging.basicConfig(
-            stream=sys.stdout,
-            level=log_level,
-            format='%(asctime)s | %(levelname)s | %(filename)s | %(lineno)s | %(message)s'
+        stream=sys.stdout,
+        level=log_level,
+        format='%(asctime)s | %(levelname)s | %(filename)s | %(lineno)s | %(message)s'
     )
 log_config(DEBUG)
 
@@ -104,14 +102,17 @@ def get_csv_values():
     max_lat = request.json['lat']
     lng = request.json['lng']
     radius = request.json['radius']
-
     markers = []
     for path in csv_paths:
         rows = read_csv(path)
         for row in rows:
             # Check if inside the circle
-            dis = haversine(lon1=float(row['lng']), lat1=float(row['lat']), lon2=globalLong, lat2=globalLat)
-            if(dis < 1):
+            dis = haversine(
+                lon1=float(row['lng']),
+                lat1=float(row['lat']),
+                lon2=globalLong,
+                lat2=globalLat)
+            if dis < 1:
                 markers.append({
                     'path': path.split('/')[-1],
                     'name': row['name'],
